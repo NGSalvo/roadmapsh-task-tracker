@@ -114,7 +114,29 @@ func TestMain(t *testing.T) {
 		asserts.Empty(result)
 	})
 
+	t.Run("Should mark a task as in progress", func(t *testing.T) {
+		taskList := NewTaskList()
+		taskList.AddTask(&Task{1, "Test Task", TODO})
+		taskList.MarkInProgress(1)
+
+		asserts.Equal(taskList.Tasks[0].Status, IN_PROGRESS)
+	})
+
+	t.Run("Should mark a task as done", func(t *testing.T) {
+		taskList := NewTaskList()
+		taskList.AddTask(&Task{1, "Test Task", IN_PROGRESS})
+		taskList.MarkDone(1)
+	})
 }
+
+/*
+Add, Update, and Delete tasks
+Mark a task as in progress or done
+List all tasks
+List all tasks that are done
+List all tasks that are not done
+List all tasks that are in progress
+*/
 
 func joinMessage(tasks *TaskList) string {
 	message := []string{}
