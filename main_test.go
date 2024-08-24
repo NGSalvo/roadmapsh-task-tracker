@@ -51,10 +51,19 @@ func TestMain(t *testing.T) {
 	t.Run("Should update the description of a task", func(t *testing.T) {
 		taskList := NewTaskList()
 		taskList.AddTask(&Task{1, "Test Task", TODO})
-		taskList.UpdateTask(1, "Updated Task")
+		err := taskList.UpdateTask(1, "Updated Task")
 
 		asserts.Equal(len(taskList.Tasks), 1)
 		asserts.Equal(taskList.Tasks[0].Description, "Updated Task")
+		asserts.Nil(err)
+	})
+
+	t.Run("Should return an error when trying to update the description of a task that does not exist", func(t *testing.T) {
+		taskList := NewTaskList()
+		err := taskList.UpdateTask(1, "Updated Task")
+
+		asserts.Nil(taskList.Tasks)
+		asserts.EqualError(err, "task with ID 1 not found")
 	})
 
 	t.Run("Should print all tasks", func(t *testing.T) {
