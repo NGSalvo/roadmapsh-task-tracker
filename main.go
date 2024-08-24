@@ -72,13 +72,15 @@ func (tl *TaskList) RemoveTask(id int) int {
 	return -1
 }
 
-func (tl *TaskList) UpdateTask(id int, description string) {
+func (tl *TaskList) UpdateTask(id int, description string) error {
 	for _, v := range tl.Tasks {
 		if v.Id == id {
 			v.Description = description
-			return
+			return nil
 		}
 	}
+
+	return fmt.Errorf("task with ID %d not found", id)
 }
 
 func (tl *TaskList) PrintAll() {
