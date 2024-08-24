@@ -44,7 +44,17 @@ func TestMain(t *testing.T) {
 		taskList.AddTask(&Task{1, "Test Task", IN_PROGRESS})
 		v := taskList.RemoveTask(2)
 
+		asserts.Equal(len(taskList.Tasks), 1)
 		asserts.Equal(v, -1)
+	})
+
+	t.Run("Should update the description of a task", func(t *testing.T) {
+		taskList := NewTaskList()
+		taskList.AddTask(&Task{1, "Test Task", TODO})
+		taskList.UpdateTask(1, "Updated Task")
+
+		asserts.Equal(len(taskList.Tasks), 1)
+		asserts.Equal(taskList.Tasks[0].Description, "Updated Task")
 	})
 
 	t.Run("Should print all tasks", func(t *testing.T) {
