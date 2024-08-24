@@ -2,12 +2,15 @@ package main
 
 import (
 	"fmt"
+	"time"
 )
 
 type Task struct {
 	Id          int
 	Description string
 	Status      Status
+	CreatedAt   time.Time
+	UpdatedAt   *time.Time
 }
 
 type Status string
@@ -17,7 +20,7 @@ type TaskList struct {
 }
 
 const (
-	taskString          = "ID: %d, Description: %s, Status: %s\n"
+	taskString          = "ID: %d, Description: %s, Status: %s, Created at: %s, Updated at: %s\n"
 	TODO         Status = Status("To do")
 	IN_PROGRESS  Status = Status("In progress")
 	DONE         Status = Status("Done")
@@ -31,24 +34,33 @@ func main() {
 		1,
 		"First Task",
 		IN_PROGRESS,
+		time.Now(),
+		nil,
 	})
 	tasks.AddTask(&Task{
 		2,
 		"Second Task",
 		IN_PROGRESS,
+		time.Now(),
+		nil,
 	})
 
 	tasks.AddTask(&Task{
 		3,
 		"Third Task",
 		DONE,
+		time.Now(),
+		nil,
 	})
 	tasks.RemoveTask(2)
 
+	updateTime := time.Now().AddDate(0, 0, 1)
 	tasks.AddTask(&Task{
 		2,
 		"Second Task",
 		"In progress",
+		time.Now(),
+		&updateTime,
 	})
 
 	tasks.PrintAll()
@@ -137,7 +149,11 @@ func (tl *TaskList) MarkDone(id int) {
 }
 
 func (t *Task) printTask() {
-	fmt.Printf(taskString, t.Id, t.Description, t.Status)
+	if t.UpdatedAt == nil {
+		fmt.Printf(taskString, t.Id, t.Description, t.Status, t.CreatedAt.Format(time.DateOnly), "")
+		return
+	}
+	fmt.Printf(taskString, t.Id, t.Description, t.Status, t.CreatedAt.Format(time.DateOnly), t.UpdatedAt.Format("02/01/2006"))
 }
 
 func (t *Task) MarkAs(status Status) {
