@@ -68,6 +68,17 @@ func TestMain(t *testing.T) {
 		asserts.Nil(err)
 	})
 
+	t.Run("Should update the description of the second task", func(t *testing.T) {
+		taskList := NewTaskList()
+		taskList.AddTask(&Task{1, "Test Task", IN_PROGRESS})
+		taskList.AddTask(&Task{2, "Test Task", IN_PROGRESS})
+		err := taskList.UpdateTask(2, "Updated Task")
+
+		asserts.Equal(len(taskList.Tasks), 2)
+		asserts.Equal(taskList.Tasks[1].Description, "Updated Task")
+		asserts.Nil(err)
+	})
+
 	t.Run("Should return an error when trying to update the description of a task that does not exist", func(t *testing.T) {
 		taskList := NewTaskList()
 		err := taskList.UpdateTask(1, "Updated Task")
@@ -159,9 +170,6 @@ func TestMain(t *testing.T) {
 }
 
 /*
-Add, Update, and Delete tasks
-Mark a task as in progress or done
-List all tasks
 List all tasks that are done
 List all tasks that are not done
 List all tasks that are in progress
