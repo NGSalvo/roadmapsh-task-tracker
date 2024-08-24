@@ -29,23 +29,26 @@ func TestMain(t *testing.T) {
 		asserts.Equal(len(taskList.Tasks), 0)
 	})
 
-	t.Run("Should remove the second element from the list", func(t *testing.T) {
+	t.Run("Should remove the second element from the list and return the removed task", func(t *testing.T) {
 		taskList := NewTaskList()
 		taskList.AddTask(&Task{1, "Test Task", IN_PROGRESS})
 		taskList.AddTask(&Task{2, "Test Task", IN_PROGRESS})
-		taskList.RemoveTask(2)
+		task, err := taskList.RemoveTask(2)
 
 		asserts.Equal(len(taskList.Tasks), 1)
 		asserts.Equal(taskList.Tasks[0].Id, 1)
+		asserts.Equal(task.Id, 2)
+		asserts.Nil(err)
 	})
 
-	t.Run("Should return -1 when removing a task that does not exist", func(t *testing.T) {
+	t.Run("Should return an error when removing a task that does not exist", func(t *testing.T) {
 		taskList := NewTaskList()
 		taskList.AddTask(&Task{1, "Test Task", IN_PROGRESS})
-		v := taskList.RemoveTask(2)
+		task, err := taskList.RemoveTask(2)
 
 		asserts.Equal(len(taskList.Tasks), 1)
-		asserts.Equal(v, -1)
+		asserts.EqualError(err, "task with ID 2 not found")
+		asserts.Nil(task)
 	})
 
 	t.Run("Should update the description of a task", func(t *testing.T) {
