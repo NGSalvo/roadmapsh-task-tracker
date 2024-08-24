@@ -7,18 +7,20 @@ import (
 type Task struct {
 	Id          int
 	Description string
-	Status      string
+	Status      Status
 }
+
+type Status string
 
 type TaskList struct {
 	Tasks []*Task
 }
 
 const (
-	taskString   = "ID: %d, Description: %s, Status: %s\n"
-	IN_PROGRESS  = "In progress"
-	DONE         = "Done"
-	noTaskString = "No tasks found"
+	taskString          = "ID: %d, Description: %s, Status: %s\n"
+	IN_PROGRESS  Status = Status("In progress")
+	DONE         Status = Status("Done")
+	noTaskString        = "No tasks found"
 )
 
 func main() {
@@ -108,4 +110,8 @@ func (tl *TaskList) printHasNoTasks() {
 
 func (t *Task) printTask() {
 	fmt.Printf(taskString, t.Id, t.Description, t.Status)
+}
+
+func (s Status) String() string {
+	return string(s)
 }
