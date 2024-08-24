@@ -64,8 +64,12 @@ func TestMain(t *testing.T) {
 		taskList.AddTask(createTask(1, TODO))
 		err := taskList.UpdateTask(1, "Updated Task")
 
+		updatedAt := time.Now().Format(time.DateOnly)
+
 		asserts.Equal(len(taskList.Tasks), 1)
 		asserts.Equal(taskList.Tasks[0].Description, "Updated Task")
+		asserts.Equal(taskList.Tasks[0].UpdatedAt.Format(time.DateOnly), string(updatedAt))
+		asserts.GreaterOrEqual(taskList.Tasks[0].UpdatedAt.Format(time.DateOnly), string(updatedAt))
 		asserts.Nil(err)
 	})
 
@@ -75,8 +79,12 @@ func TestMain(t *testing.T) {
 		taskList.AddTask(createTask(2, IN_PROGRESS))
 		err := taskList.UpdateTask(2, "Updated Task")
 
+		updatedAt := time.Now().Format(time.DateOnly)
+
 		asserts.Equal(len(taskList.Tasks), 2)
 		asserts.Equal(taskList.Tasks[1].Description, "Updated Task")
+		asserts.Equal(taskList.Tasks[1].UpdatedAt.Format(time.DateOnly), string(updatedAt))
+		asserts.GreaterOrEqual(taskList.Tasks[1].UpdatedAt.Format(time.DateOnly), string(updatedAt))
 		asserts.Nil(err)
 	})
 

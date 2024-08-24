@@ -87,6 +87,8 @@ func (tl *TaskList) RemoveTask(id int) (*Task, error) {
 func (tl *TaskList) UpdateTask(id int, description string) error {
 	for _, v := range tl.Tasks {
 		if v.Id == id {
+			updatedTime := time.Now()
+			v.UpdatedAt = &updatedTime
 			v.Description = description
 			return nil
 		}
