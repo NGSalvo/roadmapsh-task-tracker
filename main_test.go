@@ -13,6 +13,13 @@ import (
 
 func TestMain(t *testing.T) {
 	asserts := assert.New(t)
+
+	t.Run("Should create a new task list", func(t *testing.T) {
+		taskList := NewTaskList()
+
+		asserts.Equal(len(taskList.Tasks), 0)
+	})
+
 	t.Run("Should add a task to the list", func(t *testing.T) {
 		task := &Task{1, "Test Task", IN_PROGRESS}
 		taskList := NewTaskList()
