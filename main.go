@@ -62,14 +62,14 @@ func (tl *TaskList) AddTask(task *Task) {
 	tl.Tasks = append(tl.Tasks, task)
 }
 
-func (tl *TaskList) RemoveTask(id int) int {
+func (tl *TaskList) RemoveTask(id int) (*Task, error) {
 	for i, v := range tl.Tasks {
 		if v.Id == id {
 			tl.Tasks = append(tl.Tasks[:i], tl.Tasks[i+1:]...)
-			return id
+			return v, nil
 		}
 	}
-	return -1
+	return nil, fmt.Errorf("task with ID %d not found", id)
 }
 
 func (tl *TaskList) UpdateTask(id int, description string) error {
