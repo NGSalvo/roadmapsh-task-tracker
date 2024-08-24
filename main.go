@@ -72,6 +72,15 @@ func (tl *TaskList) RemoveTask(id int) int {
 	return -1
 }
 
+func (tl *TaskList) UpdateTask(id int, description string) {
+	for _, v := range tl.Tasks {
+		if v.Id == id {
+			v.Description = description
+			return
+		}
+	}
+}
+
 func (tl *TaskList) PrintAll() {
 	tl.printHasNoTasks()
 
