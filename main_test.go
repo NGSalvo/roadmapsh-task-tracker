@@ -39,7 +39,7 @@ func TestMain(t *testing.T) {
 		asserts.Equal(taskList.Tasks[0].Id, 1)
 	})
 
-	t.Run("Should return -1 when the task is not found", func(t *testing.T) {
+	t.Run("Should return -1 when removing a task that does not exist", func(t *testing.T) {
 		taskList := NewTaskList()
 		taskList.AddTask(&Task{1, "Test Task", IN_PROGRESS})
 		v := taskList.RemoveTask(2)
