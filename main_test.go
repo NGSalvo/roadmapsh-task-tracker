@@ -7,6 +7,7 @@ import (
 	"os"
 	"strings"
 	"testing"
+	"time"
 
 	"github.com/stretchr/testify/assert"
 )
@@ -21,7 +22,7 @@ func TestMain(t *testing.T) {
 	})
 
 	t.Run("✅ Should add a task to the list", func(t *testing.T) {
-		task := &Task{1, "Test Task", IN_PROGRESS}
+		task := createTask(1, IN_PROGRESS)
 		taskList := NewTaskList()
 		taskList.AddTask(task)
 
@@ -30,7 +31,7 @@ func TestMain(t *testing.T) {
 
 	t.Run("✅ Should remove the first element from the list", func(t *testing.T) {
 		taskList := NewTaskList()
-		taskList.AddTask(&Task{1, "Test Task", IN_PROGRESS})
+		taskList.AddTask(createTask(1, IN_PROGRESS))
 		taskList.RemoveTask(1)
 
 		asserts.Equal(len(taskList.Tasks), 0)
@@ -38,8 +39,8 @@ func TestMain(t *testing.T) {
 
 	t.Run("✅ Should remove the second element from the list and return the removed task", func(t *testing.T) {
 		taskList := NewTaskList()
-		taskList.AddTask(&Task{1, "Test Task", IN_PROGRESS})
-		taskList.AddTask(&Task{2, "Test Task", IN_PROGRESS})
+		taskList.AddTask(createTask(1, IN_PROGRESS))
+		taskList.AddTask(createTask(2, IN_PROGRESS))
 		task, err := taskList.RemoveTask(2)
 
 		asserts.Equal(len(taskList.Tasks), 1)
@@ -50,7 +51,7 @@ func TestMain(t *testing.T) {
 
 	t.Run("❌ Should return an error when removing a task that does not exist", func(t *testing.T) {
 		taskList := NewTaskList()
-		taskList.AddTask(&Task{1, "Test Task", IN_PROGRESS})
+		taskList.AddTask(createTask(1, IN_PROGRESS))
 		task, err := taskList.RemoveTask(2)
 
 		asserts.Equal(len(taskList.Tasks), 1)
@@ -60,7 +61,7 @@ func TestMain(t *testing.T) {
 
 	t.Run("✅ Should update the description of a task", func(t *testing.T) {
 		taskList := NewTaskList()
-		taskList.AddTask(&Task{1, "Test Task", TODO})
+		taskList.AddTask(createTask(1, TODO))
 		err := taskList.UpdateTask(1, "Updated Task")
 
 		asserts.Equal(len(taskList.Tasks), 1)
@@ -70,8 +71,8 @@ func TestMain(t *testing.T) {
 
 	t.Run("✅ Should update the description of the second task", func(t *testing.T) {
 		taskList := NewTaskList()
-		taskList.AddTask(&Task{1, "Test Task", IN_PROGRESS})
-		taskList.AddTask(&Task{2, "Test Task", IN_PROGRESS})
+		taskList.AddTask(createTask(1, IN_PROGRESS))
+		taskList.AddTask(createTask(2, IN_PROGRESS))
 		err := taskList.UpdateTask(2, "Updated Task")
 
 		asserts.Equal(len(taskList.Tasks), 2)
@@ -89,8 +90,8 @@ func TestMain(t *testing.T) {
 
 	t.Run("✅ Should print all tasks", func(t *testing.T) {
 		taskList := NewTaskList()
-		taskList.AddTask(&Task{1, "Test Task", IN_PROGRESS})
-		taskList.AddTask(&Task{2, "Test Task", IN_PROGRESS})
+		taskList.AddTask(createTask(1, IN_PROGRESS))
+		taskList.AddTask(createTask(2, DONE))
 
 		expected := joinMessage(taskList)
 		expected = expected + "\n--------------- Total Tasks: 2 ---------------\n"
@@ -102,9 +103,9 @@ func TestMain(t *testing.T) {
 
 	t.Run("✅ Should print all done tasks", func(t *testing.T) {
 		taskList := NewTaskList()
-		taskList.AddTask(&Task{1, "Test Task", DONE})
-		taskList.AddTask(&Task{2, "Test Task", IN_PROGRESS})
-		taskList.AddTask(&Task{3, "Test Task", DONE})
+		taskList.AddTask(createTask(1, DONE))
+		taskList.AddTask(createTask(2, IN_PROGRESS))
+		taskList.AddTask(createTask(3, DONE))
 
 		expected := joinMessageWithFilter(taskList, DONE) + "\n"
 		result := outputToString(taskList.PrintDone)
@@ -115,9 +116,9 @@ func TestMain(t *testing.T) {
 
 	t.Run("✅ Should print all in progress tasks", func(t *testing.T) {
 		taskList := NewTaskList()
-		taskList.AddTask(&Task{1, "Test Task", IN_PROGRESS})
-		taskList.AddTask(&Task{2, "Test Task", IN_PROGRESS})
-		taskList.AddTask(&Task{3, "Test Task", DONE})
+		taskList.AddTask(createTask(1, IN_PROGRESS))
+		taskList.AddTask(createTask(2, IN_PROGRESS))
+		taskList.AddTask(createTask(3, DONE))
 
 		expected := joinMessageWithFilter(taskList, IN_PROGRESS) + "\n"
 		result := outputToString(taskList.PrintInProgress)
@@ -137,8 +138,8 @@ func TestMain(t *testing.T) {
 
 	t.Run("❌ Should not print when there are no done tasks", func(t *testing.T) {
 		taskList := NewTaskList()
-		taskList.AddTask(&Task{1, "Test Task", IN_PROGRESS})
-		taskList.AddTask(&Task{2, "Test Task", IN_PROGRESS})
+		taskList.AddTask(createTask(1, IN_PROGRESS))
+		taskList.AddTask(createTask(2, IN_PROGRESS))
 
 		result := outputToString(taskList.PrintDone)
 		asserts.Equal(len(taskList.Tasks), 2)
@@ -147,7 +148,7 @@ func TestMain(t *testing.T) {
 
 	t.Run("❌ Should not print when there are no in progress tasks", func(t *testing.T) {
 		taskList := NewTaskList()
-		taskList.AddTask(&Task{3, "Test Task", DONE})
+		taskList.AddTask(createTask(3, DONE))
 
 		result := outputToString(taskList.PrintInProgress)
 		asserts.Equal(len(taskList.Tasks), 1)
@@ -156,7 +157,7 @@ func TestMain(t *testing.T) {
 
 	t.Run("✅ Should mark a task as in progress", func(t *testing.T) {
 		taskList := NewTaskList()
-		taskList.AddTask(&Task{1, "Test Task", TODO})
+		taskList.AddTask(createTask(1, TODO))
 		taskList.MarkInProgress(1)
 
 		asserts.Equal(taskList.Tasks[0].Status, IN_PROGRESS)
@@ -164,7 +165,7 @@ func TestMain(t *testing.T) {
 
 	t.Run("✅ Should mark a task as done", func(t *testing.T) {
 		taskList := NewTaskList()
-		taskList.AddTask(&Task{1, "Test Task", IN_PROGRESS})
+		taskList.AddTask(createTask(1, TODO))
 		taskList.MarkDone(1)
 	})
 }
@@ -172,7 +173,11 @@ func TestMain(t *testing.T) {
 func joinMessage(tasks *TaskList) string {
 	message := []string{}
 	for _, task := range tasks.Tasks {
-		message = append(message, fmt.Sprintf("ID: %d, Description: %s, Status: %s", task.Id, task.Description, task.Status))
+		if task.UpdatedAt == nil {
+			message = append(message, fmt.Sprintf("ID: %d, Description: %s, Status: %s, Created at: %s, Updated at: %s", task.Id, task.Description, task.Status, task.CreatedAt.Format(time.DateOnly), ""))
+			continue
+		}
+		message = append(message, fmt.Sprintf("ID: %d, Description: %s, Status: %s, Created at: %s, Updated at: %s", task.Id, task.Description, task.Status, task.CreatedAt.Format(time.DateOnly), task.UpdatedAt.Format("02/01/2006")))
 	}
 	return strings.Join(message, "\n")
 }
@@ -183,7 +188,11 @@ func joinMessageWithFilter(tasks *TaskList, filter Status) string {
 		if filter != "" && task.Status != filter {
 			continue
 		}
-		message = append(message, fmt.Sprintf("ID: %d, Description: %s, Status: %s", task.Id, task.Description, task.Status))
+		if task.UpdatedAt == nil {
+			message = append(message, fmt.Sprintf("ID: %d, Description: %s, Status: %s, Created at: %s, Updated at: %s", task.Id, task.Description, task.Status, task.CreatedAt.Format(time.DateOnly), ""))
+			continue
+		}
+		message = append(message, fmt.Sprintf("ID: %d, Description: %s, Status: %s, Created at: %s, Updated at: %s", task.Id, task.Description, task.Status, task.CreatedAt.Format(time.DateOnly), task.UpdatedAt.Format("02/01/2006")))
 	}
 	return strings.Join(message, "\n")
 }
@@ -216,4 +225,14 @@ func outputToString(callback func()) string {
 	io.Copy(&buf, r)
 
 	return buf.String()
+}
+
+func createTask(id int, status Status) *Task {
+	return &Task{
+		Id:          id,
+		Description: fmt.Sprintf("Task %d", id),
+		Status:      status,
+		CreatedAt:   time.Date(2024, 8, 24, 0, 0, 0, 0, time.UTC),
+		UpdatedAt:   nil,
+	}
 }
