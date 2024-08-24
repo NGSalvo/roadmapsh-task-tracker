@@ -18,6 +18,7 @@ type TaskList struct {
 
 const (
 	taskString          = "ID: %d, Description: %s, Status: %s\n"
+	TODO         Status = Status("To do")
 	IN_PROGRESS  Status = Status("In progress")
 	DONE         Status = Status("Done")
 	noTaskString        = "No tasks found"
@@ -108,8 +109,28 @@ func (tl *TaskList) printHasNoTasks() {
 	}
 }
 
+func (tl *TaskList) MarkInProgress(id int) {
+	for _, task := range tl.Tasks {
+		if task.Id == id {
+			task.MarkAs(IN_PROGRESS)
+		}
+	}
+}
+
+func (tl *TaskList) MarkDone(id int) {
+	for _, task := range tl.Tasks {
+		if task.Id == id {
+			task.MarkAs(DONE)
+		}
+	}
+}
+
 func (t *Task) printTask() {
 	fmt.Printf(taskString, t.Id, t.Description, t.Status)
+}
+
+func (t *Task) MarkAs(status Status) {
+	t.Status = status
 }
 
 func (s Status) String() string {
