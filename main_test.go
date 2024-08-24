@@ -13,17 +13,17 @@ import (
 
 func TestMain(t *testing.T) {
 	asserts := assert.New(t)
-	t.Run("AddTask", func(t *testing.T) {
-		task := &Task{1, "Test Task", "In progress"}
+	t.Run("Should add a task to the list", func(t *testing.T) {
+		task := &Task{1, "Test Task", IN_PROGRESS}
 		taskList := NewTaskList()
 		taskList.AddTask(task)
 
 		asserts.Equal(len(taskList.Tasks), 1)
 	})
 
-	t.Run("RemoveTask", func(t *testing.T) {
+	t.Run("Should remove the first element from the list", func(t *testing.T) {
 		taskList := NewTaskList()
-		taskList.AddTask(&Task{1, "Test Task", "In progress"})
+		taskList.AddTask(&Task{1, "Test Task", IN_PROGRESS})
 		taskList.RemoveTask(1)
 
 		asserts.Equal(len(taskList.Tasks), 0)
@@ -31,8 +31,8 @@ func TestMain(t *testing.T) {
 
 	t.Run("Should remove the second element from the list", func(t *testing.T) {
 		taskList := NewTaskList()
-		taskList.AddTask(&Task{1, "Test Task", "In progress"})
-		taskList.AddTask(&Task{2, "Test Task", "In progress"})
+		taskList.AddTask(&Task{1, "Test Task", IN_PROGRESS})
+		taskList.AddTask(&Task{2, "Test Task", IN_PROGRESS})
 		taskList.RemoveTask(2)
 
 		asserts.Equal(len(taskList.Tasks), 1)
@@ -41,7 +41,7 @@ func TestMain(t *testing.T) {
 
 	t.Run("Should return -1 when the task is not found", func(t *testing.T) {
 		taskList := NewTaskList()
-		taskList.AddTask(&Task{1, "Test Task", "In progress"})
+		taskList.AddTask(&Task{1, "Test Task", IN_PROGRESS})
 		v := taskList.RemoveTask(2)
 
 		asserts.Equal(v, -1)
@@ -49,8 +49,8 @@ func TestMain(t *testing.T) {
 
 	t.Run("Should print all tasks", func(t *testing.T) {
 		taskList := NewTaskList()
-		taskList.AddTask(&Task{1, "Test Task", "In progress"})
-		taskList.AddTask(&Task{2, "Test Task", "In progress"})
+		taskList.AddTask(&Task{1, "Test Task", IN_PROGRESS})
+		taskList.AddTask(&Task{2, "Test Task", IN_PROGRESS})
 
 		expected := joinMessage(taskList)
 		expected = expected + "\n--------------- Total Tasks: 2 ---------------\n"
@@ -62,9 +62,9 @@ func TestMain(t *testing.T) {
 
 	t.Run("Should print all done tasks", func(t *testing.T) {
 		taskList := NewTaskList()
-		taskList.AddTask(&Task{1, "Test Task", "In progress"})
-		taskList.AddTask(&Task{2, "Test Task", "In progress"})
-		taskList.AddTask(&Task{3, "Test Task", "Done"})
+		taskList.AddTask(&Task{1, "Test Task", DONE})
+		taskList.AddTask(&Task{2, "Test Task", IN_PROGRESS})
+		taskList.AddTask(&Task{3, "Test Task", DONE})
 
 		expected := joinMessageWithFilter(taskList, DONE) + "\n"
 		result := outputToString(taskList.PrintDone)
@@ -75,9 +75,9 @@ func TestMain(t *testing.T) {
 
 	t.Run("Should print all in progress tasks", func(t *testing.T) {
 		taskList := NewTaskList()
-		taskList.AddTask(&Task{1, "Test Task", "In progress"})
-		taskList.AddTask(&Task{2, "Test Task", "In progress"})
-		taskList.AddTask(&Task{3, "Test Task", "Done"})
+		taskList.AddTask(&Task{1, "Test Task", IN_PROGRESS})
+		taskList.AddTask(&Task{2, "Test Task", IN_PROGRESS})
+		taskList.AddTask(&Task{3, "Test Task", DONE})
 
 		expected := joinMessageWithFilter(taskList, IN_PROGRESS) + "\n"
 		result := outputToString(taskList.PrintInProgress)
@@ -97,8 +97,8 @@ func TestMain(t *testing.T) {
 
 	t.Run("Should not print when there are no done tasks", func(t *testing.T) {
 		taskList := NewTaskList()
-		taskList.AddTask(&Task{1, "Test Task", "In progress"})
-		taskList.AddTask(&Task{2, "Test Task", "In progress"})
+		taskList.AddTask(&Task{1, "Test Task", IN_PROGRESS})
+		taskList.AddTask(&Task{2, "Test Task", IN_PROGRESS})
 
 		result := outputToString(taskList.PrintDone)
 		asserts.Equal(len(taskList.Tasks), 2)
@@ -107,7 +107,7 @@ func TestMain(t *testing.T) {
 
 	t.Run("Should not print when there are no in progress tasks", func(t *testing.T) {
 		taskList := NewTaskList()
-		taskList.AddTask(&Task{3, "Test Task", "Done"})
+		taskList.AddTask(&Task{3, "Test Task", DONE})
 
 		result := outputToString(taskList.PrintInProgress)
 		asserts.Equal(len(taskList.Tasks), 1)
@@ -124,7 +124,7 @@ func joinMessage(tasks *TaskList) string {
 	return strings.Join(message, "\n")
 }
 
-func joinMessageWithFilter(tasks *TaskList, filter string) string {
+func joinMessageWithFilter(tasks *TaskList, filter Status) string {
 	message := []string{}
 	for _, task := range tasks.Tasks {
 		if filter != "" && task.Status != filter {
