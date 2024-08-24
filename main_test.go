@@ -14,13 +14,13 @@ import (
 func TestMain(t *testing.T) {
 	asserts := assert.New(t)
 
-	t.Run("Should create a new task list", func(t *testing.T) {
+	t.Run("✅ Should create a new task list", func(t *testing.T) {
 		taskList := NewTaskList()
 
 		asserts.Equal(len(taskList.Tasks), 0)
 	})
 
-	t.Run("Should add a task to the list", func(t *testing.T) {
+	t.Run("✅ Should add a task to the list", func(t *testing.T) {
 		task := &Task{1, "Test Task", IN_PROGRESS}
 		taskList := NewTaskList()
 		taskList.AddTask(task)
@@ -28,7 +28,7 @@ func TestMain(t *testing.T) {
 		asserts.Equal(len(taskList.Tasks), 1)
 	})
 
-	t.Run("Should remove the first element from the list", func(t *testing.T) {
+	t.Run("✅ Should remove the first element from the list", func(t *testing.T) {
 		taskList := NewTaskList()
 		taskList.AddTask(&Task{1, "Test Task", IN_PROGRESS})
 		taskList.RemoveTask(1)
@@ -36,7 +36,7 @@ func TestMain(t *testing.T) {
 		asserts.Equal(len(taskList.Tasks), 0)
 	})
 
-	t.Run("Should remove the second element from the list and return the removed task", func(t *testing.T) {
+	t.Run("✅ Should remove the second element from the list and return the removed task", func(t *testing.T) {
 		taskList := NewTaskList()
 		taskList.AddTask(&Task{1, "Test Task", IN_PROGRESS})
 		taskList.AddTask(&Task{2, "Test Task", IN_PROGRESS})
@@ -48,7 +48,7 @@ func TestMain(t *testing.T) {
 		asserts.Nil(err)
 	})
 
-	t.Run("Should return an error when removing a task that does not exist", func(t *testing.T) {
+	t.Run("❌ Should return an error when removing a task that does not exist", func(t *testing.T) {
 		taskList := NewTaskList()
 		taskList.AddTask(&Task{1, "Test Task", IN_PROGRESS})
 		task, err := taskList.RemoveTask(2)
@@ -58,7 +58,7 @@ func TestMain(t *testing.T) {
 		asserts.Nil(task)
 	})
 
-	t.Run("Should update the description of a task", func(t *testing.T) {
+	t.Run("✅ Should update the description of a task", func(t *testing.T) {
 		taskList := NewTaskList()
 		taskList.AddTask(&Task{1, "Test Task", TODO})
 		err := taskList.UpdateTask(1, "Updated Task")
@@ -68,7 +68,7 @@ func TestMain(t *testing.T) {
 		asserts.Nil(err)
 	})
 
-	t.Run("Should update the description of the second task", func(t *testing.T) {
+	t.Run("✅ Should update the description of the second task", func(t *testing.T) {
 		taskList := NewTaskList()
 		taskList.AddTask(&Task{1, "Test Task", IN_PROGRESS})
 		taskList.AddTask(&Task{2, "Test Task", IN_PROGRESS})
@@ -79,7 +79,7 @@ func TestMain(t *testing.T) {
 		asserts.Nil(err)
 	})
 
-	t.Run("Should return an error when trying to update the description of a task that does not exist", func(t *testing.T) {
+	t.Run("❌ Should return an error when trying to update the description of a task that does not exist", func(t *testing.T) {
 		taskList := NewTaskList()
 		err := taskList.UpdateTask(1, "Updated Task")
 
@@ -87,7 +87,7 @@ func TestMain(t *testing.T) {
 		asserts.EqualError(err, "task with ID 1 not found")
 	})
 
-	t.Run("Should print all tasks", func(t *testing.T) {
+	t.Run("✅ Should print all tasks", func(t *testing.T) {
 		taskList := NewTaskList()
 		taskList.AddTask(&Task{1, "Test Task", IN_PROGRESS})
 		taskList.AddTask(&Task{2, "Test Task", IN_PROGRESS})
@@ -100,7 +100,7 @@ func TestMain(t *testing.T) {
 		asserts.Equal(expected, result)
 	})
 
-	t.Run("Should print all done tasks", func(t *testing.T) {
+	t.Run("✅ Should print all done tasks", func(t *testing.T) {
 		taskList := NewTaskList()
 		taskList.AddTask(&Task{1, "Test Task", DONE})
 		taskList.AddTask(&Task{2, "Test Task", IN_PROGRESS})
@@ -113,7 +113,7 @@ func TestMain(t *testing.T) {
 		asserts.Equal(expected, result)
 	})
 
-	t.Run("Should print all in progress tasks", func(t *testing.T) {
+	t.Run("✅ Should print all in progress tasks", func(t *testing.T) {
 		taskList := NewTaskList()
 		taskList.AddTask(&Task{1, "Test Task", IN_PROGRESS})
 		taskList.AddTask(&Task{2, "Test Task", IN_PROGRESS})
@@ -126,7 +126,7 @@ func TestMain(t *testing.T) {
 		asserts.Equal(expected, result)
 	})
 
-	t.Run("Should print has no tasks", func(t *testing.T) {
+	t.Run("✅ Should print has no tasks", func(t *testing.T) {
 		taskList := NewTaskList()
 
 		expected := "No tasks found" + "\n--------------- Total Tasks: 0 ---------------\n"
@@ -135,7 +135,7 @@ func TestMain(t *testing.T) {
 		asserts.Equal(expected, result)
 	})
 
-	t.Run("Should not print when there are no done tasks", func(t *testing.T) {
+	t.Run("❌ Should not print when there are no done tasks", func(t *testing.T) {
 		taskList := NewTaskList()
 		taskList.AddTask(&Task{1, "Test Task", IN_PROGRESS})
 		taskList.AddTask(&Task{2, "Test Task", IN_PROGRESS})
@@ -145,7 +145,7 @@ func TestMain(t *testing.T) {
 		asserts.Empty(result)
 	})
 
-	t.Run("Should not print when there are no in progress tasks", func(t *testing.T) {
+	t.Run("❌ Should not print when there are no in progress tasks", func(t *testing.T) {
 		taskList := NewTaskList()
 		taskList.AddTask(&Task{3, "Test Task", DONE})
 
@@ -154,7 +154,7 @@ func TestMain(t *testing.T) {
 		asserts.Empty(result)
 	})
 
-	t.Run("Should mark a task as in progress", func(t *testing.T) {
+	t.Run("✅ Should mark a task as in progress", func(t *testing.T) {
 		taskList := NewTaskList()
 		taskList.AddTask(&Task{1, "Test Task", TODO})
 		taskList.MarkInProgress(1)
@@ -162,18 +162,12 @@ func TestMain(t *testing.T) {
 		asserts.Equal(taskList.Tasks[0].Status, IN_PROGRESS)
 	})
 
-	t.Run("Should mark a task as done", func(t *testing.T) {
+	t.Run("✅ Should mark a task as done", func(t *testing.T) {
 		taskList := NewTaskList()
 		taskList.AddTask(&Task{1, "Test Task", IN_PROGRESS})
 		taskList.MarkDone(1)
 	})
 }
-
-/*
-List all tasks that are done
-List all tasks that are not done
-List all tasks that are in progress
-*/
 
 func joinMessage(tasks *TaskList) string {
 	message := []string{}
