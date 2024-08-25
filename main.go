@@ -21,8 +21,11 @@ type TaskStore interface {
 	UpdateTask(int, string) error
 }
 
-type TaskList struct {
+type InMemoryTaskStore struct {
 	Tasks []*Task
+}
+
+type JsonTaskStore struct {
 }
 
 const (
@@ -34,7 +37,7 @@ const (
 )
 
 func main() {
-	tasks := NewTaskList()
+	tasks := NewInMemoryTaskStore()
 
 	tasks.AddTask(&Task{
 		1,
@@ -72,16 +75,16 @@ func main() {
 	tasks.PrintAll()
 }
 
-func NewTaskList() *TaskList {
-	return &TaskList{}
+func NewInMemoryTaskStore() *InMemoryTaskStore {
+	return &InMemoryTaskStore{}
 }
 
-func (tl *TaskList) AddTask(task *Task) (*Task, error) {
+func (tl *InMemoryTaskStore) AddTask(task *Task) (*Task, error) {
 	tl.Tasks = append(tl.Tasks, task)
 	return task, nil
 }
 
-func (tl *TaskList) RemoveTask(id int) (*Task, error) {
+func (tl *InMemoryTaskStore) RemoveTask(id int) (*Task, error) {
 	for i, v := range tl.Tasks {
 		if v.Id == id {
 			tl.Tasks = append(tl.Tasks[:i], tl.Tasks[i+1:]...)
@@ -91,7 +94,7 @@ func (tl *TaskList) RemoveTask(id int) (*Task, error) {
 	return nil, fmt.Errorf("task with ID %d not found", id)
 }
 
-func (tl *TaskList) UpdateTask(id int, description string) error {
+func (tl *InMemoryTaskStore) UpdateTask(id int, description string) error {
 	for _, v := range tl.Tasks {
 		if v.Id == id {
 			updatedTime := time.Now()
@@ -104,7 +107,7 @@ func (tl *TaskList) UpdateTask(id int, description string) error {
 	return fmt.Errorf("task with ID %d not found", id)
 }
 
-func (tl *TaskList) PrintAll() {
+func (tl *InMemoryTaskStore) PrintAll() {
 	tl.printHasNoTasks()
 
 	for _, task := range tl.Tasks {
@@ -114,7 +117,7 @@ func (tl *TaskList) PrintAll() {
 	fmt.Printf("--------------- Total Tasks: %d ---------------\n", len(tl.Tasks))
 }
 
-func (tl *TaskList) PrintDone() {
+func (tl *InMemoryTaskStore) PrintDone() {
 	tl.printHasNoTasks()
 
 	for _, task := range tl.Tasks {
@@ -125,7 +128,7 @@ func (tl *TaskList) PrintDone() {
 
 }
 
-func (tl *TaskList) PrintInProgress() {
+func (tl *InMemoryTaskStore) PrintInProgress() {
 	tl.printHasNoTasks()
 
 	for _, task := range tl.Tasks {
@@ -135,13 +138,13 @@ func (tl *TaskList) PrintInProgress() {
 	}
 }
 
-func (tl *TaskList) printHasNoTasks() {
+func (tl *InMemoryTaskStore) printHasNoTasks() {
 	if len(tl.Tasks) == 0 {
 		fmt.Println(noTaskString)
 	}
 }
 
-func (tl *TaskList) MarkInProgress(id int) {
+func (tl *InMemoryTaskStore) MarkInProgress(id int) {
 	for _, task := range tl.Tasks {
 		if task.Id == id {
 			task.MarkAs(IN_PROGRESS)
@@ -149,7 +152,7 @@ func (tl *TaskList) MarkInProgress(id int) {
 	}
 }
 
-func (tl *TaskList) MarkDone(id int) {
+func (tl *InMemoryTaskStore) MarkDone(id int) {
 	for _, task := range tl.Tasks {
 		if task.Id == id {
 			task.MarkAs(DONE)
