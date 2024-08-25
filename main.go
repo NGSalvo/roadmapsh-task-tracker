@@ -93,7 +93,7 @@ func main() {
 		time.Now(),
 		nil,
 	})
-	// t.RemoveTask(1)
+	t.RemoveTask(1)
 	// t.UpdateTask(2, "Second Task Updated")
 	// t.PrintAll()
 }
@@ -237,6 +237,12 @@ func (j *JsonTaskStore) RemoveTask(id int) (*Task, error) {
 	for i, v := range j.Tasks {
 		if v.Id == id {
 			j.Tasks = append(j.Tasks[:i], j.Tasks[i+1:]...)
+			err := j.saveToFile()
+
+			if err != nil {
+				return nil, err
+			}
+
 			return v, nil
 		}
 	}
