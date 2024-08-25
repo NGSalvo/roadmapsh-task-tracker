@@ -16,14 +16,14 @@ func TestMain(t *testing.T) {
 	asserts := assert.New(t)
 
 	t.Run("✅ Should create a new task list", func(t *testing.T) {
-		taskList := NewTaskList()
+		taskList := NewInMemoryTaskStore()
 
 		asserts.Equal(len(taskList.Tasks), 0)
 	})
 
 	t.Run("✅ Should add a task to the list", func(t *testing.T) {
 		task := createTask(1, IN_PROGRESS)
-		taskList := NewTaskList()
+		taskList := NewInMemoryTaskStore()
 		createdTask, err := taskList.AddTask(task)
 
 		asserts.Equal(len(taskList.Tasks), 1)
@@ -33,7 +33,7 @@ func TestMain(t *testing.T) {
 	})
 
 	t.Run("✅ Should remove the first element from the list", func(t *testing.T) {
-		taskList := NewTaskList()
+		taskList := NewInMemoryTaskStore()
 		taskList.AddTask(createTask(1, IN_PROGRESS))
 		taskList.RemoveTask(1)
 
@@ -41,7 +41,7 @@ func TestMain(t *testing.T) {
 	})
 
 	t.Run("✅ Should remove the second element from the list and return the removed task", func(t *testing.T) {
-		taskList := NewTaskList()
+		taskList := NewInMemoryTaskStore()
 		taskList.AddTask(createTask(1, IN_PROGRESS))
 		taskList.AddTask(createTask(2, IN_PROGRESS))
 		task, err := taskList.RemoveTask(2)
@@ -53,7 +53,7 @@ func TestMain(t *testing.T) {
 	})
 
 	t.Run("❌ Should return an error when removing a task that does not exist", func(t *testing.T) {
-		taskList := NewTaskList()
+		taskList := NewInMemoryTaskStore()
 		taskList.AddTask(createTask(1, IN_PROGRESS))
 		task, err := taskList.RemoveTask(2)
 
@@ -63,7 +63,7 @@ func TestMain(t *testing.T) {
 	})
 
 	t.Run("✅ Should update the description of a task", func(t *testing.T) {
-		taskList := NewTaskList()
+		taskList := NewInMemoryTaskStore()
 		taskList.AddTask(createTask(1, TODO))
 		err := taskList.UpdateTask(1, "Updated Task")
 
@@ -77,7 +77,7 @@ func TestMain(t *testing.T) {
 	})
 
 	t.Run("✅ Should update the description of the second task", func(t *testing.T) {
-		taskList := NewTaskList()
+		taskList := NewInMemoryTaskStore()
 		taskList.AddTask(createTask(1, IN_PROGRESS))
 		taskList.AddTask(createTask(2, IN_PROGRESS))
 		err := taskList.UpdateTask(2, "Updated Task")
@@ -92,7 +92,7 @@ func TestMain(t *testing.T) {
 	})
 
 	t.Run("❌ Should return an error when trying to update the description of a task that does not exist", func(t *testing.T) {
-		taskList := NewTaskList()
+		taskList := NewInMemoryTaskStore()
 		err := taskList.UpdateTask(1, "Updated Task")
 
 		asserts.Nil(taskList.Tasks)
@@ -100,7 +100,7 @@ func TestMain(t *testing.T) {
 	})
 
 	t.Run("✅ Should print all tasks", func(t *testing.T) {
-		taskList := NewTaskList()
+		taskList := NewInMemoryTaskStore()
 		taskList.AddTask(createTask(1, IN_PROGRESS))
 		taskList.AddTask(createTask(2, DONE))
 
@@ -113,7 +113,7 @@ func TestMain(t *testing.T) {
 	})
 
 	t.Run("✅ Should print all done tasks", func(t *testing.T) {
-		taskList := NewTaskList()
+		taskList := NewInMemoryTaskStore()
 		taskList.AddTask(createTask(1, DONE))
 		taskList.AddTask(createTask(2, IN_PROGRESS))
 		taskList.AddTask(createTask(3, DONE))
@@ -126,7 +126,7 @@ func TestMain(t *testing.T) {
 	})
 
 	t.Run("✅ Should print all in progress tasks", func(t *testing.T) {
-		taskList := NewTaskList()
+		taskList := NewInMemoryTaskStore()
 		taskList.AddTask(createTask(1, IN_PROGRESS))
 		taskList.AddTask(createTask(2, IN_PROGRESS))
 		taskList.AddTask(createTask(3, DONE))
@@ -139,7 +139,7 @@ func TestMain(t *testing.T) {
 	})
 
 	t.Run("✅ Should print has no tasks", func(t *testing.T) {
-		taskList := NewTaskList()
+		taskList := NewInMemoryTaskStore()
 
 		expected := "No tasks found" + "\n--------------- Total Tasks: 0 ---------------\n"
 		result := outputToString(taskList.PrintAll)
@@ -148,7 +148,7 @@ func TestMain(t *testing.T) {
 	})
 
 	t.Run("❌ Should not print when there are no done tasks", func(t *testing.T) {
-		taskList := NewTaskList()
+		taskList := NewInMemoryTaskStore()
 		taskList.AddTask(createTask(1, IN_PROGRESS))
 		taskList.AddTask(createTask(2, IN_PROGRESS))
 
@@ -158,7 +158,7 @@ func TestMain(t *testing.T) {
 	})
 
 	t.Run("❌ Should not print when there are no in progress tasks", func(t *testing.T) {
-		taskList := NewTaskList()
+		taskList := NewInMemoryTaskStore()
 		taskList.AddTask(createTask(3, DONE))
 
 		result := outputToString(taskList.PrintInProgress)
@@ -167,7 +167,7 @@ func TestMain(t *testing.T) {
 	})
 
 	t.Run("✅ Should mark a task as in progress", func(t *testing.T) {
-		taskList := NewTaskList()
+		taskList := NewInMemoryTaskStore()
 		taskList.AddTask(createTask(1, TODO))
 		taskList.MarkInProgress(1)
 
@@ -175,13 +175,13 @@ func TestMain(t *testing.T) {
 	})
 
 	t.Run("✅ Should mark a task as done", func(t *testing.T) {
-		taskList := NewTaskList()
+		taskList := NewInMemoryTaskStore()
 		taskList.AddTask(createTask(1, TODO))
 		taskList.MarkDone(1)
 	})
 }
 
-func joinMessage(tasks *TaskList) string {
+func joinMessage(tasks *InMemoryTaskStore) string {
 	message := []string{}
 	for _, task := range tasks.Tasks {
 		if task.UpdatedAt == nil {
@@ -193,7 +193,7 @@ func joinMessage(tasks *TaskList) string {
 	return strings.Join(message, "\n")
 }
 
-func joinMessageWithFilter(tasks *TaskList, filter Status) string {
+func joinMessageWithFilter(tasks *InMemoryTaskStore, filter Status) string {
 	message := []string{}
 	for _, task := range tasks.Tasks {
 		if filter != "" && task.Status != filter {
