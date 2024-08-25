@@ -1,16 +1,18 @@
 package main
 
 import (
+	"encoding/json"
 	"fmt"
+	"os"
 	"time"
 )
 
 type Task struct {
-	Id          int
-	Description string
-	Status      Status
-	CreatedAt   time.Time
-	UpdatedAt   *time.Time
+	Id          int        `json:"id"`
+	Description string     `json:"description"`
+	Status      Status     `json:"status"`
+	CreatedAt   time.Time  `json:"created_at"`
+	UpdatedAt   *time.Time `json:"updated_at"`
 }
 
 type Status string
@@ -26,6 +28,8 @@ type InMemoryTaskStore struct {
 }
 
 type JsonTaskStore struct {
+	Tasks        []*Task
+	JsonFileName string
 }
 
 const (
@@ -73,6 +77,25 @@ func main() {
 	})
 
 	tasks.PrintAll()
+
+	t := NewJsonTaskStore("tasks.json")
+	t.AddTask(&Task{
+		1,
+		"First Task",
+		IN_PROGRESS,
+		time.Now(),
+		nil,
+	})
+	t.AddTask(&Task{
+		2,
+		"Second Task",
+		IN_PROGRESS,
+		time.Now(),
+		nil,
+	})
+	// t.RemoveTask(1)
+	// t.UpdateTask(2, "Second Task Updated")
+	// t.PrintAll()
 }
 
 func NewInMemoryTaskStore() *InMemoryTaskStore {
@@ -174,4 +197,48 @@ func (t *Task) MarkAs(status Status) {
 
 func (s Status) String() string {
 	return string(s)
+}
+
+func NewJsonTaskStore(jsonFileName string) *JsonTaskStore {
+	return &JsonTaskStore{
+		Tasks:        []*Task{},
+		JsonFileName: jsonFileName,
+	}
+}
+
+func (j *JsonTaskStore) saveToFile() error {
+	file, err := json.MarshalIndent(j.Tasks, "", " ")
+
+	if err != nil {
+		return err
+	}
+
+	err = os.WriteFile(j.JsonFileName, file, 0644)
+
+	if err != nil {
+		return err
+	}
+	return nil
+}
+
+func (j *JsonTaskStore) AddTask(task *Task) (*Task, error) {
+	j.Tasks = append(j.Tasks, task)
+
+	err := j.saveToFile()
+
+	if err != nil {
+		return nil, err
+	}
+
+	return task, nil
+}
+
+func (j *JsonTaskStore) RemoveTask(id int) (*Task, error) {
+	for i, v := range j.Tasks {
+		if v.Id == id {
+			j.Tasks = append(j.Tasks[:i], j.Tasks[i+1:]...)
+			return v, nil
+		}
+	}
+	return nil, fmt.Errorf("task with ID %d not found", id)
 }
