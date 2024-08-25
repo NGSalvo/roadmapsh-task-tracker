@@ -94,7 +94,7 @@ func main() {
 		nil,
 	})
 	t.RemoveTask(1)
-	// t.UpdateTask(2, "Second Task Updated")
+	t.UpdateTask(2, "Second Task Updated")
 	// t.PrintAll()
 }
 
@@ -247,4 +247,21 @@ func (j *JsonTaskStore) RemoveTask(id int) (*Task, error) {
 		}
 	}
 	return nil, fmt.Errorf("task with ID %d not found", id)
+}
+
+func (j *JsonTaskStore) UpdateTask(id int, description string) error {
+	for _, v := range j.Tasks {
+		if v.Id == id {
+			updatedTime := time.Now()
+			v.UpdatedAt = &updatedTime
+			v.Description = description
+			err := j.saveToFile()
+
+			if err != nil {
+				return err
+			}
+			return nil
+		}
+	}
+	return fmt.Errorf("task with ID %d not found", id)
 }
