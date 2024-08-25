@@ -24,9 +24,12 @@ func TestMain(t *testing.T) {
 	t.Run("✅ Should add a task to the list", func(t *testing.T) {
 		task := createTask(1, IN_PROGRESS)
 		taskList := NewTaskList()
-		taskList.AddTask(task)
+		createdTask, err := taskList.AddTask(task)
 
 		asserts.Equal(len(taskList.Tasks), 1)
+		asserts.Contains(taskList.Tasks, createdTask)
+		asserts.Equal(createdTask.Id, 1)
+		asserts.Nil(err)
 	})
 
 	t.Run("✅ Should remove the first element from the list", func(t *testing.T) {
