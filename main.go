@@ -78,6 +78,7 @@ func main() {
 
 	tasks.PrintAll()
 
+	fmt.Println("\n\n--------- JSON TASKS ---------")
 	t := NewJsonTaskStore("tasks.json")
 	t.AddTask(&Task{
 		1,
@@ -95,7 +96,7 @@ func main() {
 	})
 	t.RemoveTask(1)
 	t.UpdateTask(2, "Second Task Updated")
-	// t.PrintAll()
+	t.PrintAll()
 }
 
 func NewInMemoryTaskStore() *InMemoryTaskStore {
@@ -221,6 +222,21 @@ func (j *JsonTaskStore) saveToFile() error {
 	return nil
 }
 
+func (j *JsonTaskStore) loadFromFile() error {
+	file, err := os.ReadFile(j.JsonFileName)
+
+	if err != nil {
+		return err
+	}
+
+	err = json.Unmarshal(file, &j.Tasks)
+
+	if err != nil {
+		return err
+	}
+	return nil
+}
+
 func (j *JsonTaskStore) AddTask(task *Task) (*Task, error) {
 	j.Tasks = append(j.Tasks, task)
 
@@ -264,4 +280,19 @@ func (j *JsonTaskStore) UpdateTask(id int, description string) error {
 		}
 	}
 	return fmt.Errorf("task with ID %d not found", id)
+}
+
+func (j *JsonTaskStore) printHasNoTasks() {
+	if len(j.Tasks) == 0 {
+		fmt.Println(noTaskString)
+	}
+}
+
+func (j *JsonTaskStore) PrintAll() {
+	j.printHasNoTasks()
+
+	for _, task := range j.Tasks {
+		task.printTask()
+	}
+	fmt.Printf("--------------- Total Tasks: %d ---------------\n", len(j.Tasks))
 }
