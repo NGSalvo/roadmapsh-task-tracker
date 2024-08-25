@@ -16,7 +16,7 @@ type Task struct {
 type Status string
 
 type TaskStore interface {
-	AddTask(*Task) error
+	AddTask(*Task) (*Task, error)
 	RemoveTask(int) (*Task, error)
 	UpdateTask(int, string) error
 }
