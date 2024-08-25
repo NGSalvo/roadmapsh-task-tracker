@@ -15,6 +15,12 @@ type Task struct {
 
 type Status string
 
+type TaskStore interface {
+	AddTask(*Task) error
+	RemoveTask(int) (*Task, error)
+	UpdateTask(int, string) error
+}
+
 type TaskList struct {
 	Tasks []*Task
 }
@@ -70,8 +76,9 @@ func NewTaskList() *TaskList {
 	return &TaskList{}
 }
 
-func (tl *TaskList) AddTask(task *Task) {
+func (tl *TaskList) AddTask(task *Task) (*Task, error) {
 	tl.Tasks = append(tl.Tasks, task)
+	return task, nil
 }
 
 func (tl *TaskList) RemoveTask(id int) (*Task, error) {
