@@ -99,6 +99,13 @@ func main() {
 	t.PrintAll()
 	t.PrintDone()
 	t.PrintInProgress()
+	t.MarkAsDone(2)
+	err := t.MarkAsDone(3)
+	t.PrintAll()
+
+	if err != nil {
+		fmt.Println(err)
+	}
 }
 
 func NewInMemoryTaskStore() *InMemoryTaskStore {
@@ -382,4 +389,35 @@ func (j *JsonTaskStore) PrintInProgress() error {
 		task.printTask()
 	}
 	return nil
+}
+
+func (j *JsonTaskStore) MarkInProgress(id int) error {
+	for _, task := range j.Tasks {
+		if task.Id == id {
+			task.MarkAs(IN_PROGRESS)
+
+			err := j.saveToFile()
+			if err != nil {
+				return err
+			}
+
+			return nil
+		}
+	}
+	return fmt.Errorf("task with ID %d not found", id)
+}
+
+func (j *JsonTaskStore) MarkAsDone(id int) error {
+	for _, task := range j.Tasks {
+		if task.Id == id {
+			task.MarkAs(DONE)
+
+			err := j.saveToFile()
+			if err != nil {
+				return err
+			}
+			return nil
+		}
+	}
+	return fmt.Errorf("task with ID %d not found", id)
 }
