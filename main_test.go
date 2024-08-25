@@ -147,23 +147,23 @@ func TestMain(t *testing.T) {
 		asserts.Equal(expected, result)
 	})
 
-	t.Run("❌ Should not print when there are no done tasks", func(t *testing.T) {
+	t.Run("❌ Should print a message when there are no done tasks", func(t *testing.T) {
 		taskList := NewInMemoryTaskStore()
 		taskList.AddTask(createTask(1, IN_PROGRESS))
 		taskList.AddTask(createTask(2, IN_PROGRESS))
 
 		result := outputToString(taskList.PrintDone)
 		asserts.Equal(len(taskList.Tasks), 2)
-		asserts.Empty(result)
+		asserts.Equal("No tasks found\n", result)
 	})
 
-	t.Run("❌ Should not print when there are no in progress tasks", func(t *testing.T) {
+	t.Run("❌ Should print a message when there are no in progress tasks", func(t *testing.T) {
 		taskList := NewInMemoryTaskStore()
 		taskList.AddTask(createTask(3, DONE))
 
 		result := outputToString(taskList.PrintInProgress)
 		asserts.Equal(len(taskList.Tasks), 1)
-		asserts.Empty(result)
+		asserts.Equal("No tasks found\n", result)
 	})
 
 	t.Run("✅ Should mark a task as in progress", func(t *testing.T) {
