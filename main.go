@@ -97,6 +97,8 @@ func main() {
 	t.RemoveTask(1)
 	t.UpdateTask(2, "Second Task Updated")
 	t.PrintAll()
+	t.PrintDone()
+	t.PrintInProgress()
 }
 
 func NewInMemoryTaskStore() *InMemoryTaskStore {
@@ -144,21 +146,42 @@ func (tl *InMemoryTaskStore) PrintAll() {
 func (tl *InMemoryTaskStore) PrintDone() {
 	tl.printHasNoTasks()
 
+	filterdTasks := []*Task{}
+
 	for _, task := range tl.Tasks {
 		if task.Status == DONE {
-			task.printTask()
+			filterdTasks = append(filterdTasks, task)
 		}
 	}
 
+	if len(filterdTasks) == 0 {
+		fmt.Println(noTaskString)
+		return
+	}
+
+	for _, task := range filterdTasks {
+		task.printTask()
+	}
 }
 
 func (tl *InMemoryTaskStore) PrintInProgress() {
 	tl.printHasNoTasks()
 
+	filterdTasks := []*Task{}
+
 	for _, task := range tl.Tasks {
 		if task.Status == IN_PROGRESS {
-			task.printTask()
+			filterdTasks = append(filterdTasks, task)
 		}
+	}
+
+	if len(filterdTasks) == 0 {
+		fmt.Println(noTaskString)
+		return
+	}
+
+	for _, task := range filterdTasks {
+		task.printTask()
 	}
 }
 
@@ -288,11 +311,75 @@ func (j *JsonTaskStore) printHasNoTasks() {
 	}
 }
 
-func (j *JsonTaskStore) PrintAll() {
+func (j *JsonTaskStore) PrintAll() error {
+	err := j.loadFromFile()
+
+	if err != nil {
+		return err
+	}
+
 	j.printHasNoTasks()
 
 	for _, task := range j.Tasks {
 		task.printTask()
 	}
 	fmt.Printf("--------------- Total Tasks: %d ---------------\n", len(j.Tasks))
+	return nil
+}
+
+func (j *JsonTaskStore) PrintDone() error {
+	err := j.loadFromFile()
+
+	if err != nil {
+		return err
+	}
+
+	j.printHasNoTasks()
+
+	filterdTasks := []*Task{}
+
+	for _, task := range j.Tasks {
+		if task.Status == DONE {
+			filterdTasks = append(filterdTasks, task)
+		}
+	}
+
+	if len(filterdTasks) == 0 {
+		fmt.Println(noTaskString)
+		return nil
+	}
+
+	for _, task := range filterdTasks {
+		task.printTask()
+	}
+
+	return nil
+}
+
+func (j *JsonTaskStore) PrintInProgress() error {
+	err := j.loadFromFile()
+
+	if err != nil {
+		return err
+	}
+
+	j.printHasNoTasks()
+
+	filterdTasks := []*Task{}
+
+	for _, task := range j.Tasks {
+		if task.Status == IN_PROGRESS {
+			filterdTasks = append(filterdTasks, task)
+		}
+	}
+
+	if len(filterdTasks) == 0 {
+		fmt.Println(noTaskString)
+		return nil
+	}
+
+	for _, task := range filterdTasks {
+		task.printTask()
+	}
+	return nil
 }
