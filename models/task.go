@@ -27,6 +27,12 @@ type TaskStore interface {
 	AddTask(*Task) (*Task, error)
 	RemoveTask(int) (*Task, error)
 	UpdateTask(int, string) error
+	PrintAll() error
+	PrintTodo() error
+	PrintDone() error
+	PrintInProgress() error
+	MarkInProgress(int) error
+	MarkDone(int) error
 }
 
 func (t *Task) PrintTask() {
