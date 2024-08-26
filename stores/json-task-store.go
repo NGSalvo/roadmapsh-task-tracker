@@ -89,6 +89,12 @@ func (j *JsonTaskStore) RemoveTask(id int) (*models.Task, error) {
 }
 
 func (j *JsonTaskStore) UpdateTask(id int, description string) error {
+	err := j.loadFromFile()
+
+	if err != nil {
+		return err
+	}
+
 	for _, v := range j.Tasks {
 		if v.Id == id {
 			updatedTime := time.Now()
@@ -230,7 +236,7 @@ func (j *JsonTaskStore) MarkInProgress(id int) error {
 	return fmt.Errorf("task with ID %d not found", id)
 }
 
-func (j *JsonTaskStore) MarkAsDone(id int) error {
+func (j *JsonTaskStore) MarkDone(id int) error {
 	for _, task := range j.Tasks {
 		if task.Id == id {
 			task.MarkAs(models.DONE)
