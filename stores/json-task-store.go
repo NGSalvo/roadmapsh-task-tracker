@@ -127,6 +127,36 @@ func (j *JsonTaskStore) PrintAll() error {
 	return nil
 }
 
+func (j *JsonTaskStore) PrintTodo() error {
+	err := j.loadFromFile()
+
+	if err != nil {
+		return err
+	}
+
+	j.printHasNoTasks()
+
+	filterdTasks := []*models.Task{}
+
+	for _, task := range j.Tasks {
+		if task.Status == models.TODO {
+			filterdTasks = append(filterdTasks, task)
+		}
+	}
+
+	if len(filterdTasks) == 0 {
+		fmt.Println(models.NoTaskString)
+		return nil
+	}
+
+	for _, task := range filterdTasks {
+		task.PrintTask()
+	}
+
+	return nil
+
+}
+
 func (j *JsonTaskStore) PrintDone() error {
 	err := j.loadFromFile()
 
