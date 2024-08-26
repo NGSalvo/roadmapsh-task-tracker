@@ -51,9 +51,19 @@ func (j *JsonTaskStore) loadFromFile() error {
 }
 
 func (j *JsonTaskStore) AddTask(task *models.Task) (*models.Task, error) {
+	id, err := j.assignId()
+
+	if err != nil {
+		return nil, err
+	}
+
+	task.Id = id
+	task.CreatedAt = time.Now()
+	task.Status = models.TODO
+
 	j.Tasks = append(j.Tasks, task)
 
-	err := j.saveToFile()
+	err = j.saveToFile()
 
 	if err != nil {
 		return nil, err
@@ -203,4 +213,24 @@ func (j *JsonTaskStore) MarkAsDone(id int) error {
 		}
 	}
 	return fmt.Errorf("task with ID %d not found", id)
+}
+
+func (j *JsonTaskStore) assignId() (int, error) {
+	err := j.loadFromFile()
+
+	if err != nil {
+		return 0, err
+	}
+
+	if len(j.Tasks) == 0 {
+		return 1, nil
+	}
+
+	currentMax := 1
+	for _, task := range j.Tasks {
+		if task.Id > currentMax {
+			currentMax = task.Id
+		}
+	}
+	return currentMax + 1, nil
 }
