@@ -1,4 +1,4 @@
-package main
+package stores
 
 import (
 	"bytes"
@@ -6,13 +6,14 @@ import (
 	"io"
 	"os"
 	"strings"
+	"task-tracker/models"
 	"testing"
 	"time"
 
 	"github.com/stretchr/testify/assert"
 )
 
-func TestMain(t *testing.T) {
+func TestInMemoryTaskStore(t *testing.T) {
 	asserts := assert.New(t)
 
 	t.Run("✅ Should create a new task list", func(t *testing.T) {
@@ -22,7 +23,7 @@ func TestMain(t *testing.T) {
 	})
 
 	t.Run("✅ Should add a task to the list", func(t *testing.T) {
-		task := createTask(1, IN_PROGRESS)
+		task := createTask(1, models.IN_PROGRESS)
 		taskList := NewInMemoryTaskStore()
 		createdTask, err := taskList.AddTask(task)
 
@@ -34,7 +35,7 @@ func TestMain(t *testing.T) {
 
 	t.Run("✅ Should remove the first element from the list", func(t *testing.T) {
 		taskList := NewInMemoryTaskStore()
-		taskList.AddTask(createTask(1, IN_PROGRESS))
+		taskList.AddTask(createTask(1, models.IN_PROGRESS))
 		taskList.RemoveTask(1)
 
 		asserts.Equal(len(taskList.Tasks), 0)
@@ -42,8 +43,8 @@ func TestMain(t *testing.T) {
 
 	t.Run("✅ Should remove the second element from the list and return the removed task", func(t *testing.T) {
 		taskList := NewInMemoryTaskStore()
-		taskList.AddTask(createTask(1, IN_PROGRESS))
-		taskList.AddTask(createTask(2, IN_PROGRESS))
+		taskList.AddTask(createTask(1, models.IN_PROGRESS))
+		taskList.AddTask(createTask(2, models.IN_PROGRESS))
 		task, err := taskList.RemoveTask(2)
 
 		asserts.Equal(len(taskList.Tasks), 1)
@@ -54,7 +55,7 @@ func TestMain(t *testing.T) {
 
 	t.Run("❌ Should return an error when removing a task that does not exist", func(t *testing.T) {
 		taskList := NewInMemoryTaskStore()
-		taskList.AddTask(createTask(1, IN_PROGRESS))
+		taskList.AddTask(createTask(1, models.IN_PROGRESS))
 		task, err := taskList.RemoveTask(2)
 
 		asserts.Equal(len(taskList.Tasks), 1)
@@ -64,7 +65,7 @@ func TestMain(t *testing.T) {
 
 	t.Run("✅ Should update the description of a task", func(t *testing.T) {
 		taskList := NewInMemoryTaskStore()
-		taskList.AddTask(createTask(1, TODO))
+		taskList.AddTask(createTask(1, models.TODO))
 		err := taskList.UpdateTask(1, "Updated Task")
 
 		updatedAt := time.Now().Format(time.DateOnly)
@@ -78,8 +79,8 @@ func TestMain(t *testing.T) {
 
 	t.Run("✅ Should update the description of the second task", func(t *testing.T) {
 		taskList := NewInMemoryTaskStore()
-		taskList.AddTask(createTask(1, IN_PROGRESS))
-		taskList.AddTask(createTask(2, IN_PROGRESS))
+		taskList.AddTask(createTask(1, models.IN_PROGRESS))
+		taskList.AddTask(createTask(2, models.IN_PROGRESS))
 		err := taskList.UpdateTask(2, "Updated Task")
 
 		updatedAt := time.Now().Format(time.DateOnly)
@@ -101,8 +102,8 @@ func TestMain(t *testing.T) {
 
 	t.Run("✅ Should print all tasks", func(t *testing.T) {
 		taskList := NewInMemoryTaskStore()
-		taskList.AddTask(createTask(1, IN_PROGRESS))
-		taskList.AddTask(createTask(2, DONE))
+		taskList.AddTask(createTask(1, models.IN_PROGRESS))
+		taskList.AddTask(createTask(2, models.DONE))
 
 		expected := joinMessage(taskList)
 		expected = expected + "\n--------------- Total Tasks: 2 ---------------\n"
@@ -114,11 +115,11 @@ func TestMain(t *testing.T) {
 
 	t.Run("✅ Should print all done tasks", func(t *testing.T) {
 		taskList := NewInMemoryTaskStore()
-		taskList.AddTask(createTask(1, DONE))
-		taskList.AddTask(createTask(2, IN_PROGRESS))
-		taskList.AddTask(createTask(3, DONE))
+		taskList.AddTask(createTask(1, models.DONE))
+		taskList.AddTask(createTask(2, models.IN_PROGRESS))
+		taskList.AddTask(createTask(3, models.DONE))
 
-		expected := joinMessageWithFilter(taskList, DONE) + "\n"
+		expected := joinMessageWithFilter(taskList, models.DONE) + "\n"
 		result := outputToString(taskList.PrintDone)
 
 		asserts.Equal(len(taskList.Tasks), 3)
@@ -127,11 +128,11 @@ func TestMain(t *testing.T) {
 
 	t.Run("✅ Should print all in progress tasks", func(t *testing.T) {
 		taskList := NewInMemoryTaskStore()
-		taskList.AddTask(createTask(1, IN_PROGRESS))
-		taskList.AddTask(createTask(2, IN_PROGRESS))
-		taskList.AddTask(createTask(3, DONE))
+		taskList.AddTask(createTask(1, models.IN_PROGRESS))
+		taskList.AddTask(createTask(2, models.IN_PROGRESS))
+		taskList.AddTask(createTask(3, models.DONE))
 
-		expected := joinMessageWithFilter(taskList, IN_PROGRESS) + "\n"
+		expected := joinMessageWithFilter(taskList, models.IN_PROGRESS) + "\n"
 		result := outputToString(taskList.PrintInProgress)
 
 		asserts.Equal(len(taskList.Tasks), 3)
@@ -149,8 +150,8 @@ func TestMain(t *testing.T) {
 
 	t.Run("❌ Should print a message when there are no done tasks", func(t *testing.T) {
 		taskList := NewInMemoryTaskStore()
-		taskList.AddTask(createTask(1, IN_PROGRESS))
-		taskList.AddTask(createTask(2, IN_PROGRESS))
+		taskList.AddTask(createTask(1, models.IN_PROGRESS))
+		taskList.AddTask(createTask(2, models.IN_PROGRESS))
 
 		result := outputToString(taskList.PrintDone)
 		asserts.Equal(len(taskList.Tasks), 2)
@@ -159,7 +160,7 @@ func TestMain(t *testing.T) {
 
 	t.Run("❌ Should print a message when there are no in progress tasks", func(t *testing.T) {
 		taskList := NewInMemoryTaskStore()
-		taskList.AddTask(createTask(3, DONE))
+		taskList.AddTask(createTask(3, models.DONE))
 
 		result := outputToString(taskList.PrintInProgress)
 		asserts.Equal(len(taskList.Tasks), 1)
@@ -168,15 +169,15 @@ func TestMain(t *testing.T) {
 
 	t.Run("✅ Should mark a task as in progress", func(t *testing.T) {
 		taskList := NewInMemoryTaskStore()
-		taskList.AddTask(createTask(1, TODO))
+		taskList.AddTask(createTask(1, models.TODO))
 		taskList.MarkInProgress(1)
 
-		asserts.Equal(taskList.Tasks[0].Status, IN_PROGRESS)
+		asserts.Equal(taskList.Tasks[0].Status, models.IN_PROGRESS)
 	})
 
 	t.Run("✅ Should mark a task as done", func(t *testing.T) {
 		taskList := NewInMemoryTaskStore()
-		taskList.AddTask(createTask(1, TODO))
+		taskList.AddTask(createTask(1, models.TODO))
 		taskList.MarkDone(1)
 	})
 }
@@ -193,7 +194,7 @@ func joinMessage(tasks *InMemoryTaskStore) string {
 	return strings.Join(message, "\n")
 }
 
-func joinMessageWithFilter(tasks *InMemoryTaskStore, filter Status) string {
+func joinMessageWithFilter(tasks *InMemoryTaskStore, filter models.Status) string {
 	message := []string{}
 	for _, task := range tasks.Tasks {
 		if filter != "" && task.Status != filter {
@@ -238,8 +239,8 @@ func outputToString(callback func()) string {
 	return buf.String()
 }
 
-func createTask(id int, status Status) *Task {
-	return &Task{
+func createTask(id int, status models.Status) *models.Task {
+	return &models.Task{
 		Id:          id,
 		Description: fmt.Sprintf("Task %d", id),
 		Status:      status,

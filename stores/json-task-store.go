@@ -14,6 +14,8 @@ type JsonTaskStore struct {
 }
 
 func NewJsonTaskStore(jsonFileName string) *JsonTaskStore {
+	fileExistAndCreate(jsonFileName, &[]models.Task{})
+
 	return &JsonTaskStore{
 		Tasks:        []*models.Task{},
 		JsonFileName: jsonFileName,
@@ -113,7 +115,7 @@ func (j *JsonTaskStore) UpdateTask(id int, description string) error {
 
 func (j *JsonTaskStore) printHasNoTasks() {
 	if len(j.Tasks) == 0 {
-		fmt.Println()
+		fmt.Println("No tasks found")
 	}
 }
 
@@ -269,4 +271,31 @@ func (j *JsonTaskStore) assignId() (int, error) {
 		}
 	}
 	return currentMax + 1, nil
+}
+
+func fileExistAndCreate(jsonFileName string, model any) {
+	if model == nil {
+		model = &[]models.Task{}
+	}
+	if _, err := os.Stat(jsonFileName); os.IsNotExist(err) {
+		file, err := os.Create(jsonFileName)
+
+		if err != nil {
+			panic("Error creating file: " + err.Error())
+		}
+
+		content, err := json.MarshalIndent(model, "", " ")
+
+		if err != nil {
+			panic("Error creating file: " + err.Error())
+		}
+
+		err = os.WriteFile(jsonFileName, content, 0644)
+
+		if err != nil {
+			panic("Error creating file: " + err.Error())
+		}
+
+		file.Close()
+	}
 }
